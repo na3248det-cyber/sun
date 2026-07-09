@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>장흥 소등섬 일출 타이밍 챌린지</title>
+  <style>
+    :root {
+      --panel: rgba(8, 18, 38, 0.62);
+      --line: rgba(255, 255, 255, 0.18);
+      --text: #fff8ee;
+      --muted: #c9d7ec;
+      --accent: #ffbd45;
+      --pink: #ff6f8f;
+      --water: #44d5ff;
+      --good: #83ffbf;
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      overflow: hidden;
+      color: var(--text);
+      background: #07142d;
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+      border: 0;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .app {
+      position: relative;
+      width: 100vw;
+      min-height: 100svh;
+      overflow: hidden;
+      isolation: isolate;
+      background:
+        radial-gradient(circle at 50% 78%, rgba(255, 164, 74, calc(0.18 + var(--dawn) * 0.46)), transparent 28%),
+        linear-gradient(
+          180deg,
+          rgb(calc(7 + var(--dawn) * 31), calc(16 + var(--dawn) * 48), calc(45 + var(--dawn) * 61)) 0%,
+          rgb(calc(15 + var(--dawn) * 112), calc(33 + var(--dawn) * 56), calc(77 + var(--dawn) * 40)) 43%,
+          rgb(calc(31 + var(--dawn) * 206), calc(45 + var(--dawn) * 90), calc(83 + var(--dawn) * 31)) 66%,
+          rgb(calc(12 + var(--dawn) * 35), calc(28 + var(--dawn) * 58), calc(61 + var(--dawn) * 69)) 100%
+        );
+      --dawn: 0;
+      --sun-y: 0;
+      --sun-x: 0.5;
+    }
+
+    .app::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -3;
+      opacity: calc(0.82 - var(--dawn) * 0.6);
+      background-image:
+        radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 1px, transparent 1.8px),
+        radial-gradient(circle, rgba(255, 255, 255, 0.7) 0 1px, transparent 2px);
+      background-position: 8% 13%, 74% 24%;
+      background-size: 170px 130px, 230px 160px;
+    }
+
+    .scene {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      overflow: hidden;
+    }
+
+    .sun {
+      position: absolute;
+      left: 50%;
+      bottom: calc(18% + var(--sun-y) * 39%);
+      width: clamp(116px, 30vw, 250px);
+      aspect-ratio: 1;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 32%, #fff2b7 0 9%, #ffd25a 25%, #ff6f53 56%, #d83d4f 100%);
+      box-shadow:
+        0 0 34px rgba(255, 163, 68, 0.82),
+        0 0 110px rgba(255, 85, 105, 0.48),
+        0 0 180px rgba(255, 194, 77, 0.24);
+      filter: saturate(1.12);
+    }
+
+    .sun::after {
+      content: "";
+      position: absolute;
+      inset: -55%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 190, 90, 0.34), transparent 62%);
+      animation: pulse 2.8s ease-in-out infinite;
+    }
+
+    .island {
+      position: absolute;
+      left: 50%;
+      bottom: 25%;
+      width: min(86vw, 720px);
+      height: clamp(72px, 14vw, 124px);
+      transform: translateX(-50%);
+      background:
+        radial-gradient(ellipse at 18% 84%, #06111f 0 16%, transparent 17%),
+        radial-gradient(ellipse at 32% 68%, #071423 0 25%, transparent 26%),
+        radial-gradient(ellipse at 50% 50%, #06111f 0 36%, transparent 37%),
+        radial-gradient(ellipse at 69% 69%, #071423 0 28%, transparent 29%),
+        radial-gradient(ellipse at 85% 82%, #06111f 0 20%, transparent 21%);
+      filter: drop-shadow(0 16px 16px rgba(0, 0, 0, 0.38));
+    }
+
+    .island::after {
+      content: "";
+      position: absolute;
+      left: 7%;
+      right: 7%;
+      bottom: 4%;
+      height: 38%;
+      border-radius: 50% 50% 44% 44%;
+      background: #050c17;
+    }
+
+    .sea {
+      position: absolute;
+      left: -8%;
+      right: -8%;
+      bottom: 0;
+      height: 30%;
+      background:
+        repeating-linear-gradient(176deg, rgba(255, 255, 255, 0.12) 0 2px, transparent 2px 28px),
+        linear-gradient(180deg, rgba(62, 169, 213, 0.18), rgba(7, 34, 70, 0.88) 34%, rgba(3, 16, 34, 0.98));
+      clip-path: polygon(0 18%, 9% 14%, 19% 20%, 30% 15%, 43% 21%, 56% 14%, 69% 20%, 82% 13%, 100% 19%, 100% 100%, 0 100%);
+    }
+
+    .sea::before {
+      content: "";
+      position: absolute;
+      inset: 11% 0 auto 0;
+      height: 44%;
+      background: linear-gradient(90deg, transparent, rgba(255, 185, 97, calc(0.1 + var(--dawn) * 0.38)), transparent);
+      transform: translateX(calc((var(--sun-x) - 0.5) * 90%));
+      filter: blur(5px);
+    }
+
+    .shell {
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: max(18px, env(safe-area-inset-top)) 18px max(18px, env(safe-area-inset-bottom));
+    }
+
+    .screen {
+      width: min(94vw, 760px);
+      display: none;
+      animation: riseIn 420ms ease both;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .hero {
+      text-align: center;
+      padding-top: min(6vh, 42px);
+    }
+
+    .kicker {
+      margin: 0 0 12px;
+      font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+      color: #9ee9ff;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 0 auto 18px;
+      max-width: 720px;
+      font-size: clamp(2.35rem, 8vw, 5.35rem);
+      line-height: 1.04;
+      letter-spacing: 0;
+      text-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .subtitle {
+      margin: 0 auto 34px;
+      max-width: 580px;
+      color: var(--muted);
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      line-height: 1.6;
+    }
+
+    .primary-btn,
+    .catch-btn {
+      position: relative;
+      min-height: 58px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ffcc55, #ff6b7d 56%, #3ed8ff);
+      color: #111827;
+      font-weight: 950;
+      box-shadow: 0 16px 42px rgba(255, 112, 91, 0.32);
+      overflow: hidden;
+    }
+
+    .primary-btn {
+      width: min(100%, 320px);
+      padding: 0 30px;
+      font-size: 1.12rem;
+    }
+
+    .primary-btn::after,
+    .catch-btn::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+      transform: translateX(-120%);
+      transition: transform 500ms ease;
+    }
+
+    .primary-btn:hover::after,
+    .catch-btn:hover::after {
+      transform: translateX(120%);
+    }
+
+    .hud {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: clamp(26px, 8vh, 86px);
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 12px 38px rgba(0, 0, 0, 0.22);
+    }
+
+    .stat {
+      min-width: 0;
+      flex: 1;
+      padding: 8px 10px;
+      text-align: center;
+    }
+
+    .stat span {
+      display: block;
+      margin-bottom: 4px;
+      color: #a7d9f1;
+      font-size: 0.74rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .stat strong {
+      font-size: clamp(1rem, 3vw, 1.4rem);
+    }
+
+    .life {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      font-size: clamp(1.05rem, 3vw, 1.45rem);
+      line-height: 1;
+    }
+
+    .game-core {
+      display: grid;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .gauge-wrap {
+      padding: clamp(18px, 4vw, 26px);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(5, 14, 31, 0.48);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 22px 64px rgba(0, 0, 0, 0.24);
+    }
+
+    .gauge-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      color: #dbeafe;
+      font-size: clamp(0.82rem, 2.4vw, 1rem);
+      font-weight: 850;
+    }
+
+    .badge {
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: #102033;
+      background: linear-gradient(135deg, #fff4a8, #79ffd1);
+      white-space: nowrap;
+      font-size: 0.76rem;
+    }
+
+    .gauge {
+      position: relative;
+      height: clamp(34px, 8vw, 48px);
+      border-radius: 999px;
+      background:
+        linear-gradient(90deg, rgba(76, 196, 255, 0.26), rgba(255, 255, 255, 0.12), rgba(255, 123, 145, 0.26)),
+        rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      overflow: hidden;
+    }
+
+    .golden-zone {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: calc(var(--zone-left) * 100%);
+      width: calc(var(--zone-width) * 100%);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.52), transparent),
+        linear-gradient(90deg, #fff38a, #ffbd45, #fff38a);
+      box-shadow: 0 0 20px rgba(255, 218, 83, 0.86);
+    }
+
+    .pointer {
+      position: absolute;
+      top: -8px;
+      bottom: -8px;
+      left: calc(var(--pointer) * 100%);
+      width: 6px;
+      border-radius: 999px;
+      background: #ffffff;
+      box-shadow: 0 0 16px rgba(255, 255, 255, 0.9), 0 0 24px rgba(80, 220, 255, 0.75);
+      transform: translateX(-50%);
+    }
+
+    .pointer::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 22px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: #fff;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.15);
+    }
+
+    .message {
+      min-height: 34px;
+      text-align: center;
+      color: #fff8d7;
+      font-weight: 950;
+      font-size: clamp(1rem, 3.6vw, 1.55rem);
+      text-shadow: 0 3px 16px rgba(0, 0, 0, 0.45);
+    }
+
+    .catch-btn {
+      width: 100%;
+      min-height: clamp(70px, 14vw, 92px);
+      font-size: clamp(1.15rem, 4vw, 1.8rem);
+      letter-spacing: 0;
+    }
+
+    .catch-btn:active,
+    .primary-btn:active {
+      transform: translateY(2px) scale(0.99);
+    }
+
+    .result-box {
+      text-align: center;
+      padding: clamp(24px, 6vw, 42px);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: rgba(4, 13, 31, 0.62);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 24px 72px rgba(0, 0, 0, 0.3);
+    }
+
+    .result-box h2 {
+      margin: 0 0 16px;
+      font-size: clamp(2.1rem, 8vw, 4.3rem);
+      line-height: 1.05;
+    }
+
+    .final-score {
+      margin: 0 0 14px;
+      font-size: clamp(1.35rem, 5vw, 2.5rem);
+      font-weight: 950;
+      color: #ffdb72;
+    }
+
+    .promo {
+      margin: 0 auto 26px;
+      max-width: 520px;
+      color: #d6edff;
+      font-size: clamp(1rem, 3vw, 1.18rem);
+      line-height: 1.65;
+    }
+
+    .rank-form {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      width: min(100%, 520px);
+      margin: 0 auto 18px;
+    }
+
+    .name-input {
+      min-width: 0;
+      min-height: 52px;
+      padding: 0 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      outline: 0;
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--text);
+      font: inherit;
+      font-weight: 800;
+      text-align: center;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    }
+
+    .name-input::placeholder {
+      color: rgba(226, 241, 255, 0.62);
+    }
+
+    .save-btn,
+    .clear-btn {
+      min-height: 52px;
+      padding: 0 18px;
+      border-radius: 999px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .save-btn {
+      background: linear-gradient(135deg, #7df7cd, #55d8ff);
+      color: #082033;
+    }
+
+    .save-btn:disabled {
+      cursor: default;
+      opacity: 0.58;
+    }
+
+    .leaderboard {
+      width: min(100%, 520px);
+      margin: 0 auto 22px;
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.08);
+      text-align: left;
+    }
+
+    .leaderboard-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .leaderboard h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .clear-btn {
+      min-height: 36px;
+      padding: 0 12px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #d6edff;
+      font-size: 0.82rem;
+    }
+
+    .rank-list {
+      display: grid;
+      gap: 7px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .rank-item {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: rgba(5, 14, 31, 0.34);
+    }
+
+    .rank-item.current {
+      background: linear-gradient(90deg, rgba(255, 218, 92, 0.28), rgba(68, 213, 255, 0.18));
+      box-shadow: inset 0 0 0 1px rgba(255, 226, 119, 0.34);
+    }
+
+    .rank-no {
+      color: #ffdb72;
+      font-weight: 950;
+    }
+
+    .rank-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 850;
+    }
+
+    .rank-score {
+      color: #9ee9ff;
+      font-weight: 950;
+    }
+
+    .splash-layer {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      overflow: hidden;
+    }
+
+    .drop {
+      position: absolute;
+      left: 50%;
+      top: 55%;
+      width: var(--size);
+      aspect-ratio: 1;
+      border-radius: 52% 48% 58% 42%;
+      background:
+        radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.9) 0 14%, transparent 15%),
+        linear-gradient(145deg, rgba(143, 239, 255, 0.96), rgba(29, 154, 255, 0.8));
+      transform: translate(-50%, -50%) scale(0.2);
+      animation: splash 850ms cubic-bezier(.18,.83,.25,1) forwards;
+      box-shadow: 0 0 18px rgba(68, 213, 255, 0.54);
+    }
+
+    .flash {
+      animation: flash 620ms ease;
+    }
+
+    @keyframes splash {
+      100% {
+        transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1);
+        opacity: 0;
+      }
+    }
+
+    @keyframes flash {
+      0%, 100% { filter: brightness(1); }
+      36% { filter: brightness(1.32) saturate(1.18); }
+    }
+
+    @keyframes riseIn {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      50% {
+        transform: scale(1.08);
+        opacity: 0.75;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .shell {
+        align-items: stretch;
+      }
+
+      .screen.active {
+        min-height: calc(100svh - 36px);
+        display: grid;
+        align-content: center;
+      }
+
+      .game-screen.active {
+        align-content: space-between;
+      }
+
+      .hud {
+        gap: 0;
+        border-radius: 18px;
+      }
+
+      .stat {
+        padding: 7px 5px;
+      }
+
+      .gauge-wrap {
+        border-radius: 20px;
+      }
+
+      .rank-form {
+        grid-template-columns: 1fr;
+      }
+
+      .save-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" id="app">
+    <div class="scene" aria-hidden="true">
+      <div class="sun" id="sun"></div>
+      <div class="island"></div>
+      <div class="sea"></div>
+    </div>
+    <div class="splash-layer" id="splashLayer" aria-hidden="true"></div>
+
+    <div class="shell">
+      <section class="screen hero active" id="startScreen">
+        <p class="kicker">정남진 장흥 물축제</p>
+        <h1>장흥 소등섬 일출 타이밍 챌린지</h1>
+        <p class="subtitle">해가 골든존에 닿는 가장 찬란한 순간을 잡아보세요.</p>
+        <button class="primary-btn" id="startBtn" type="button">게임 시작</button>
+      </section>
+
+      <section class="screen game-screen" id="gameScreen" aria-live="polite">
+        <div class="hud">
+          <div class="stat">
+            <span>Score</span>
+            <strong id="scoreText">0</strong>
+          </div>
+          <div class="stat">
+            <span>Stage</span>
+            <strong id="stageText">1</strong>
+          </div>
+          <div class="stat">
+            <span>Life</span>
+            <div class="life" id="lifeText">♥ ♥ ♥</div>
+          </div>
+        </div>
+
+        <div class="game-core">
+          <div class="gauge-wrap">
+            <div class="gauge-label">
+              <span>소등섬 일출 게이지</span>
+              <span class="badge">Golden Zone</span>
+            </div>
+            <div class="gauge" id="gauge">
+              <div class="golden-zone"></div>
+              <div class="pointer"></div>
+            </div>
+          </div>
+          <div class="message" id="message">붉은 해가 황금빛 구간에 닿는 순간!</div>
+          <button class="catch-btn" id="catchBtn" type="button">일출 타이밍 잡기!</button>
+        </div>
+      </section>
+
+      <section class="screen" id="resultScreen">
+        <div class="result-box">
+          <h2>Game Over</h2>
+          <p class="final-score">Final Score <span id="finalScore">0</span></p>
+          <p class="promo">물축제에서 더 시원한 추억을 만들어보세요!</p>
+          <div class="rank-form">
+            <input class="name-input" id="playerName" maxlength="10" placeholder="이름 입력" autocomplete="nickname" />
+            <button class="save-btn" id="saveScoreBtn" type="button">순위 등록</button>
+          </div>
+          <div class="leaderboard">
+            <div class="leaderboard-head">
+              <h3>소등섬 일출 명예의 전당</h3>
+              <button class="clear-btn" id="clearRankBtn" type="button">초기화</button>
+            </div>
+            <ol class="rank-list" id="rankList"></ol>
+          </div>
+          <button class="primary-btn" id="retryBtn" type="button">다시 시도하기</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const app = document.getElementById("app");
+    const startScreen = document.getElementById("startScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const resultScreen = document.getElementById("resultScreen");
+    const startBtn = document.getElementById("startBtn");
+    const retryBtn = document.getElementById("retryBtn");
+    const catchBtn = document.getElementById("catchBtn");
+    const gauge = document.getElementById("gauge");
+    const scoreText = document.getElementById("scoreText");
+    const stageText = document.getElementById("stageText");
+    const lifeText = document.getElementById("lifeText");
+    const message = document.getElementById("message");
+    const finalScore = document.getElementById("finalScore");
+    const playerName = document.getElementById("playerName");
+    const saveScoreBtn = document.getElementById("saveScoreBtn");
+    const clearRankBtn = document.getElementById("clearRankBtn");
+    const rankList = document.getElementById("rankList");
+    const splashLayer = document.getElementById("splashLayer");
+    const rankStorageKey = "sodeung-sunrise-rankings-v1";
+
+    const state = {
+      screen: "start",
+      score: 0,
+      stage: 1,
+      life: 3,
+      pointer: 0,
+      direction: 1,
+      lastTime: 0,
+      raf: 0,
+      zoneLeft: 0.42,
+      zoneWidth: 0.16,
+      currentEntryId: ""
+    };
+
+    function loadRankings() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(rankStorageKey) || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveRankings(rankings) {
+      localStorage.setItem(rankStorageKey, JSON.stringify(rankings.slice(0, 10)));
+    }
+
+    function cleanName(name) {
+      return (name || "도전자").trim().replace(/\s+/g, " ").slice(0, 10) || "도전자";
+    }
+
+    function renderRankings() {
+      const rankings = loadRankings();
+      rankList.innerHTML = "";
+
+      if (!rankings.length) {
+        const empty = document.createElement("li");
+        empty.className = "rank-item";
+        empty.innerHTML = `<span class="rank-no">-</span><span class="rank-name">아직 등록된 기록이 없어요</span><span class="rank-score">0</span>`;
+        rankList.appendChild(empty);
+        return;
+      }
+
+      rankings.forEach((entry, index) => {
+        const item = document.createElement("li");
+        item.className = `rank-item${entry.id === state.currentEntryId ? " current" : ""}`;
+        item.innerHTML = `
+          <span class="rank-no">${index + 1}</span>
+          <span class="rank-name"></span>
+          <span class="rank-score">${Number(entry.score || 0).toLocaleString("ko-KR")}</span>
+        `;
+        item.querySelector(".rank-name").textContent = entry.name || "도전자";
+        rankList.appendChild(item);
+      });
+    }
+
+    function registerScore() {
+      if (!state.currentEntryId) return;
+      const rankings = loadRankings();
+      const entry = {
+        id: state.currentEntryId,
+        name: cleanName(playerName.value),
+        score: state.score,
+        stage: state.stage,
+        createdAt: Date.now()
+      };
+      const updated = rankings
+        .filter((rank) => rank.id !== entry.id)
+        .concat(entry)
+        .sort((a, b) => {
+          if (b.score !== a.score) return b.score - a.score;
+          return (b.stage || 0) - (a.stage || 0);
+        })
+        .slice(0, 10);
+
+      saveRankings(updated);
+      saveScoreBtn.disabled = true;
+      saveScoreBtn.textContent = "등록 완료";
+      renderRankings();
+    }
+
+    function showScreen(name) {
+      state.screen = name;
+      startScreen.classList.toggle("active", name === "start");
+      gameScreen.classList.toggle("active", name === "game");
+      resultScreen.classList.toggle("active", name === "result");
+    }
+
+    function setStageZone() {
+      const width = Math.max(0.075, 0.17 - state.stage * 0.008);
+      const left = 0.18 + ((state.stage * 0.137) % 0.56);
+      state.zoneWidth = width;
+      state.zoneLeft = Math.min(0.86 - width, left);
+      gauge.style.setProperty("--zone-left", state.zoneLeft);
+      gauge.style.setProperty("--zone-width", state.zoneWidth);
+    }
+
+    function updateHud() {
+      scoreText.textContent = state.score.toLocaleString("ko-KR");
+      stageText.textContent = state.stage;
+      lifeText.textContent = "♥ ".repeat(state.life).trim() || "♡";
+    }
+
+    function resetGame() {
+      state.score = 0;
+      state.stage = 1;
+      state.life = 3;
+      state.pointer = 0;
+      state.direction = 1;
+      state.lastTime = 0;
+      setStageZone();
+      updateHud();
+      message.textContent = "붉은 해가 황금빛 구간에 닿는 순간!";
+      app.style.setProperty("--dawn", 0);
+      app.style.setProperty("--sun-y", 0);
+      gauge.style.setProperty("--pointer", 0);
+      showScreen("game");
+      cancelAnimationFrame(state.raf);
+      state.raf = requestAnimationFrame(tick);
+    }
+
+    function tick(time) {
+      if (state.screen !== "game") return;
+      if (!state.lastTime) state.lastTime = time;
+      const delta = Math.min(34, time - state.lastTime) / 1000;
+      state.lastTime = time;
+
+      const speed = 0.42 + state.stage * 0.085;
+      state.pointer += state.direction * speed * delta;
+      if (state.pointer >= 1) {
+        state.pointer = 1;
+        state.direction = -1;
+      } else if (state.pointer <= 0) {
+        state.pointer = 0;
+        state.direction = 1;
+      }
+
+      const dawn = Math.min(1, 0.2 + state.pointer * 0.72 + state.stage * 0.018);
+      gauge.style.setProperty("--pointer", state.pointer);
+      app.style.setProperty("--sun-y", state.pointer);
+      app.style.setProperty("--sun-x", state.pointer);
+      app.style.setProperty("--dawn", dawn);
+
+      state.raf = requestAnimationFrame(tick);
+    }
+
+    function catchSun() {
+      if (state.screen !== "game") return;
+      const center = state.zoneLeft + state.zoneWidth / 2;
+      const distance = Math.abs(state.pointer - center);
+      const gaugeWidth = Math.max(1, gauge.getBoundingClientRect().width);
+      const pointerVisualTolerance = Math.max(0.025, Math.min(0.07, 16 / gaugeWidth));
+      const inputDelayTolerance = (0.42 + state.stage * 0.085) * 0.045;
+      const tolerance = pointerVisualTolerance + inputDelayTolerance;
+      const success = state.pointer >= state.zoneLeft - tolerance && state.pointer <= state.zoneLeft + state.zoneWidth + tolerance;
+
+      if (success) {
+        const precisionRange = state.zoneWidth / 2 + tolerance;
+        const precisionBonus = Math.max(0, Math.round((1 - distance / precisionRange) * 50));
+        const gain = 100 + state.stage * 25 + precisionBonus;
+        state.score += gain;
+        state.stage += 1;
+        state.pointer = 0;
+        state.direction = 1;
+        state.lastTime = 0;
+        setStageZone();
+        updateHud();
+        message.textContent = `성공! +${gain} 물폭탄처럼 시원한 타이밍!`;
+        splash();
+        app.classList.remove("flash");
+        void app.offsetWidth;
+        app.classList.add("flash");
+      } else {
+        state.life -= 1;
+        updateHud();
+        message.textContent = state.life > 0 ? "아쉬워요! 황금빛 구간을 다시 노려보세요." : "해가 지나갔어요.";
+        if (state.life <= 0) {
+          endGame();
+        }
+      }
+    }
+
+    function splash() {
+      splashLayer.innerHTML = "";
+      for (let i = 0; i < 28; i += 1) {
+        const drop = document.createElement("span");
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 70 + Math.random() * 190;
+        drop.className = "drop";
+        drop.style.setProperty("--x", `${Math.cos(angle) * distance}px`);
+        drop.style.setProperty("--y", `${Math.sin(angle) * distance - 30}px`);
+        drop.style.setProperty("--size", `${8 + Math.random() * 22}px`);
+        drop.style.animationDelay = `${Math.random() * 80}ms`;
+        splashLayer.appendChild(drop);
+      }
+      window.setTimeout(() => {
+        splashLayer.innerHTML = "";
+      }, 1000);
+    }
+
+    function endGame() {
+      cancelAnimationFrame(state.raf);
+      finalScore.textContent = state.score.toLocaleString("ko-KR");
+      app.style.setProperty("--dawn", 1);
+      app.style.setProperty("--sun-y", 0.78);
+      showScreen("result");
+    }
+
+    startBtn.addEventListener("click", resetGame);
+    retryBtn.addEventListener("click", resetGame);
+    catchBtn.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      catchSun();
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.code === "Space" || event.code === "Enter") {
+        event.preventDefault();
+        if (state.screen === "start" || state.screen === "result") resetGame();
+        else catchSun();
+      }
+    });
+
+    setStageZone();
+    updateHud();
+    gauge.style.setProperty("--pointer", 0);
+  </script>
+</body>
+</html>
