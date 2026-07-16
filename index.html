@@ -14,7 +14,9 @@
       --pink: #ff6f8f;
       --water: #44d5ff;
       --good: #83ffbf;
-      font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+      --pixel-unit: 10pt;
+      --pixel-font: "DungGeunMo", "Galmuri11", "NeoDunggeunmo Pro", "D2Coding", "Consolas", "Courier New", "Apple SD Gothic Neo", "Noto Sans KR", monospace;
+      font-family: var(--pixel-font);
     }
 
     * {
@@ -30,6 +32,11 @@
       overflow: hidden;
       color: var(--text);
       background: #07142d;
+      font-family: var(--pixel-font);
+      font-synthesis: none;
+      -webkit-font-smoothing: none;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: geometricPrecision;
     }
 
     button {
@@ -47,6 +54,8 @@
       overflow: hidden;
       isolation: isolate;
       background:
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.032) 0 1px, transparent 1px var(--pixel-unit)),
+        repeating-linear-gradient(90deg, rgba(0,0,0,0.048) 0 1px, transparent 1px var(--pixel-unit)),
         radial-gradient(circle at 50% 78%, rgba(255, 164, 74, calc(0.18 + var(--dawn) * 0.46)), transparent 28%),
         linear-gradient(
           180deg,
@@ -58,6 +67,7 @@
       --dawn: 0;
       --sun-y: 0;
       --sun-x: 0.5;
+      image-rendering: pixelated;
     }
 
     .app::before {
@@ -65,12 +75,17 @@
       position: absolute;
       inset: 0;
       z-index: -3;
-      opacity: calc(0.82 - var(--dawn) * 0.6);
+      opacity: calc(0.78 - var(--dawn) * 0.46);
       background-image:
-        radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 1px, transparent 1.8px),
-        radial-gradient(circle, rgba(255, 255, 255, 0.7) 0 1px, transparent 2px);
-      background-position: 8% 13%, 74% 24%;
-      background-size: 170px 130px, 230px 160px;
+        linear-gradient(rgba(255, 255, 255, 0.85) 0 0),
+        linear-gradient(rgba(255, 255, 255, 0.72) 0 0),
+        linear-gradient(rgba(255, 255, 255, 0.8) 0 0),
+        linear-gradient(rgba(255, 255, 255, 0.62) 0 0),
+        linear-gradient(rgba(255, 255, 255, 0.72) 0 0),
+        linear-gradient(rgba(255, 255, 255, 0.68) 0 0);
+      background-position: 9% 13%, 23% 21%, 72% 15%, 84% 28%, 58% 9%, 42% 25%;
+      background-size: calc(var(--pixel-unit) * 0.4) calc(var(--pixel-unit) * 0.4), calc(var(--pixel-unit) * 0.6) calc(var(--pixel-unit) * 0.6), calc(var(--pixel-unit) * 0.4) calc(var(--pixel-unit) * 0.4), calc(var(--pixel-unit) * 0.52) calc(var(--pixel-unit) * 0.52), calc(var(--pixel-unit) * 0.32) calc(var(--pixel-unit) * 0.32), calc(var(--pixel-unit) * 0.4) calc(var(--pixel-unit) * 0.4);
+      background-repeat: no-repeat;
     }
 
     .scene {
@@ -87,22 +102,22 @@
       width: clamp(116px, 30vw, 250px);
       aspect-ratio: 1;
       transform: translateX(-50%);
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 35% 32%, #fff2b7 0 9%, #ffd25a 25%, #ff6f53 56%, #d83d4f 100%);
+      background: url("assets/sun-pixel.png") center / contain no-repeat;
       box-shadow:
-        0 0 34px rgba(255, 163, 68, 0.82),
-        0 0 110px rgba(255, 85, 105, 0.48),
-        0 0 180px rgba(255, 194, 77, 0.24);
+        0 0 0 8px rgba(255, 163, 68, 0.12),
+        0 0 0 18px rgba(255, 85, 105, 0.08),
+        0 0 90px rgba(255, 194, 77, 0.24);
       filter: saturate(1.12);
+      image-rendering: pixelated;
     }
 
     .sun::after {
       content: "";
       position: absolute;
       inset: -55%;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 190, 90, 0.34), transparent 62%);
+      background:
+        linear-gradient(rgba(255, 190, 90, 0.18) 0 0) 45% 0 / 10% 100% no-repeat,
+        linear-gradient(90deg, rgba(255, 190, 90, 0.18) 0 0) 0 45% / 100% 10% no-repeat;
       animation: pulse 2.8s ease-in-out infinite;
     }
 
@@ -114,12 +129,13 @@
       height: clamp(72px, 14vw, 124px);
       transform: translateX(-50%);
       background:
-        radial-gradient(ellipse at 18% 84%, #06111f 0 16%, transparent 17%),
-        radial-gradient(ellipse at 32% 68%, #071423 0 25%, transparent 26%),
-        radial-gradient(ellipse at 50% 50%, #06111f 0 36%, transparent 37%),
-        radial-gradient(ellipse at 69% 69%, #071423 0 28%, transparent 29%),
-        radial-gradient(ellipse at 85% 82%, #06111f 0 20%, transparent 21%);
-      filter: drop-shadow(0 16px 16px rgba(0, 0, 0, 0.38));
+        linear-gradient(#050c17 0 0) 6% 72% / 88% 22% no-repeat,
+        linear-gradient(#06111f 0 0) 13% 58% / 18% 18% no-repeat,
+        linear-gradient(#071423 0 0) 26% 45% / 20% 32% no-repeat,
+        linear-gradient(#050c17 0 0) 43% 27% / 22% 50% no-repeat,
+        linear-gradient(#071423 0 0) 61% 48% / 21% 28% no-repeat,
+        linear-gradient(#06111f 0 0) 79% 62% / 15% 15% no-repeat;
+      filter: drop-shadow(10px 14px 0 rgba(0, 0, 0, 0.22));
     }
 
     .island::after {
@@ -129,7 +145,6 @@
       right: 7%;
       bottom: 4%;
       height: 38%;
-      border-radius: 50% 50% 44% 44%;
       background: #050c17;
     }
 
@@ -140,9 +155,10 @@
       bottom: 0;
       height: 30%;
       background:
-        repeating-linear-gradient(176deg, rgba(255, 255, 255, 0.12) 0 2px, transparent 2px 28px),
-        linear-gradient(180deg, rgba(62, 169, 213, 0.18), rgba(7, 34, 70, 0.88) 34%, rgba(3, 16, 34, 0.98));
-      clip-path: polygon(0 18%, 9% 14%, 19% 20%, 30% 15%, 43% 21%, 56% 14%, 69% 20%, 82% 13%, 100% 19%, 100% 100%, 0 100%);
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.13) 0 2px, transparent 2px var(--pixel-unit)),
+        repeating-linear-gradient(90deg, rgba(68, 213, 255, 0.12) 0 calc(var(--pixel-unit) * 0.66), transparent calc(var(--pixel-unit) * 0.66) calc(var(--pixel-unit) * 1.65)),
+        linear-gradient(180deg, rgba(62, 169, 213, 0.22), rgba(7, 34, 70, 0.9) 34%, rgba(3, 16, 34, 0.98));
+      clip-path: polygon(0 18%, 6% 18%, 6% 14%, 15% 14%, 15% 20%, 27% 20%, 27% 15%, 39% 15%, 39% 21%, 52% 21%, 52% 14%, 64% 14%, 64% 20%, 77% 20%, 77% 13%, 89% 13%, 89% 19%, 100% 19%, 100% 100%, 0 100%);
     }
 
     .sea::before {
@@ -150,9 +166,12 @@
       position: absolute;
       inset: 11% 0 auto 0;
       height: 44%;
-      background: linear-gradient(90deg, transparent, rgba(255, 185, 97, calc(0.1 + var(--dawn) * 0.38)), transparent);
+      background:
+        linear-gradient(90deg, transparent, rgba(255, 185, 97, calc(0.16 + var(--dawn) * 0.42)), transparent) center / 48% calc(var(--pixel-unit) * 0.75) no-repeat,
+        linear-gradient(90deg, transparent, rgba(255, 130, 93, calc(0.08 + var(--dawn) * 0.26)), transparent) center calc(var(--pixel-unit) * 1.5) / 39% calc(var(--pixel-unit) * 0.6) no-repeat,
+        linear-gradient(90deg, transparent, rgba(255, 226, 130, calc(0.08 + var(--dawn) * 0.24)), transparent) center calc(var(--pixel-unit) * 2.85) / 30% calc(var(--pixel-unit) * 0.52) no-repeat,
+        linear-gradient(90deg, transparent, rgba(255, 185, 97, calc(0.06 + var(--dawn) * 0.18)), transparent) center calc(var(--pixel-unit) * 4.12) / 21% calc(var(--pixel-unit) * 0.45) no-repeat;
       transform: translateX(calc((var(--sun-x) - 0.5) * 90%));
-      filter: blur(5px);
     }
 
     .shell {
@@ -183,6 +202,7 @@
       color: #9ee9ff;
       font-weight: 800;
       letter-spacing: 0;
+      text-shadow: 2px 2px 0 rgba(3, 10, 24, 0.85);
     }
 
     h1 {
@@ -191,7 +211,11 @@
       font-size: clamp(2.35rem, 8vw, 5.35rem);
       line-height: 1.04;
       letter-spacing: 0;
-      text-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+      text-shadow:
+        3px 0 0 rgba(8, 16, 35, 0.9),
+        0 3px 0 rgba(8, 16, 35, 0.9),
+        3px 3px 0 rgba(8, 16, 35, 0.9),
+        0 0 28px rgba(255, 177, 86, 0.28);
     }
 
     .subtitle {
@@ -200,6 +224,7 @@
       color: var(--muted);
       font-size: clamp(1rem, 2.5vw, 1.2rem);
       line-height: 1.6;
+      text-shadow: 2px 2px 0 rgba(3, 10, 24, 0.72);
     }
 
     .primary-btn,
@@ -212,6 +237,7 @@
       font-weight: 950;
       box-shadow: 0 16px 42px rgba(255, 112, 91, 0.32);
       overflow: hidden;
+      text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.28);
     }
 
     .primary-btn {
@@ -263,10 +289,12 @@
       font-size: 0.74rem;
       font-weight: 900;
       text-transform: uppercase;
+      text-shadow: 1px 1px 0 rgba(2, 8, 20, 0.85);
     }
 
     .stat strong {
       font-size: clamp(1rem, 3vw, 1.4rem);
+      text-shadow: 2px 2px 0 rgba(2, 8, 20, 0.82);
     }
 
     .life {
@@ -360,13 +388,20 @@
       box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.15);
     }
 
+    .pointer::after {
+      content: none;
+    }
+
     .message {
       min-height: 34px;
       text-align: center;
       color: #fff8d7;
       font-weight: 950;
       font-size: clamp(1rem, 3.6vw, 1.55rem);
-      text-shadow: 0 3px 16px rgba(0, 0, 0, 0.45);
+      text-shadow:
+        2px 0 0 rgba(3, 10, 24, 0.86),
+        0 2px 0 rgba(3, 10, 24, 0.86),
+        2px 2px 0 rgba(3, 10, 24, 0.86);
     }
 
     .catch-btn {
@@ -395,6 +430,10 @@
       margin: 0 0 16px;
       font-size: clamp(2.1rem, 8vw, 4.3rem);
       line-height: 1.05;
+      text-shadow:
+        3px 0 0 rgba(8, 16, 35, 0.9),
+        0 3px 0 rgba(8, 16, 35, 0.9),
+        3px 3px 0 rgba(8, 16, 35, 0.9);
     }
 
     .final-score {
@@ -402,6 +441,7 @@
       font-size: clamp(1.35rem, 5vw, 2.5rem);
       font-weight: 950;
       color: #ffdb72;
+      text-shadow: 2px 2px 0 rgba(3, 10, 24, 0.82);
     }
 
     .promo {
@@ -410,6 +450,7 @@
       color: #d6edff;
       font-size: clamp(1rem, 3vw, 1.18rem);
       line-height: 1.65;
+      text-shadow: 1px 1px 0 rgba(3, 10, 24, 0.72);
     }
 
     .rank-form {
@@ -433,6 +474,7 @@
       font-weight: 800;
       text-align: center;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      text-shadow: 1px 1px 0 rgba(3, 10, 24, 0.75);
     }
 
     .name-input::placeholder {
@@ -446,6 +488,7 @@
       border-radius: 999px;
       font-weight: 950;
       white-space: nowrap;
+      text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.22);
     }
 
     .save-btn {
@@ -479,6 +522,7 @@
     .leaderboard h3 {
       margin: 0;
       font-size: 1rem;
+      text-shadow: 1px 1px 0 rgba(3, 10, 24, 0.78);
     }
 
     .clear-btn {
@@ -487,6 +531,7 @@
       background: rgba(255, 255, 255, 0.12);
       color: #d6edff;
       font-size: 0.82rem;
+      text-shadow: 1px 1px 0 rgba(3, 10, 24, 0.76);
     }
 
     .rank-list {
@@ -516,6 +561,7 @@
     .rank-no {
       color: #ffdb72;
       font-weight: 950;
+      text-shadow: 1px 1px 0 rgba(3, 10, 24, 0.82);
     }
 
     .rank-name {
@@ -523,11 +569,13 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       font-weight: 850;
+      text-shadow: 1px 1px 0 rgba(3, 10, 24, 0.72);
     }
 
     .rank-score {
       color: #9ee9ff;
       font-weight: 950;
+      text-shadow: 1px 1px 0 rgba(3, 10, 24, 0.82);
     }
 
     .splash-layer {
@@ -827,6 +875,7 @@
       state.pointer = 0;
       state.direction = 1;
       state.lastTime = 0;
+      state.currentEntryId = "";
       setStageZone();
       updateHud();
       message.textContent = "붉은 해가 황금빛 구간에 닿는 순간!";
@@ -919,7 +968,12 @@
 
     function endGame() {
       cancelAnimationFrame(state.raf);
+      state.currentEntryId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
       finalScore.textContent = state.score.toLocaleString("ko-KR");
+      playerName.value = localStorage.getItem("sodeung-sunrise-last-name") || "";
+      saveScoreBtn.disabled = false;
+      saveScoreBtn.textContent = "순위 등록";
+      renderRankings();
       app.style.setProperty("--dawn", 1);
       app.style.setProperty("--sun-y", 0.78);
       showScreen("result");
@@ -927,12 +981,30 @@
 
     startBtn.addEventListener("click", resetGame);
     retryBtn.addEventListener("click", resetGame);
+    saveScoreBtn.addEventListener("click", () => {
+      localStorage.setItem("sodeung-sunrise-last-name", cleanName(playerName.value));
+      registerScore();
+    });
+    clearRankBtn.addEventListener("click", () => {
+      localStorage.removeItem(rankStorageKey);
+      renderRankings();
+      saveScoreBtn.disabled = false;
+      saveScoreBtn.textContent = "순위 등록";
+    });
+    playerName.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        localStorage.setItem("sodeung-sunrise-last-name", cleanName(playerName.value));
+        registerScore();
+      }
+    });
     catchBtn.addEventListener("pointerdown", (event) => {
       event.preventDefault();
       catchSun();
     });
 
     window.addEventListener("keydown", (event) => {
+      if (event.target === playerName) return;
       if (event.code === "Space" || event.code === "Enter") {
         event.preventDefault();
         if (state.screen === "start" || state.screen === "result") resetGame();
@@ -942,6 +1014,7 @@
 
     setStageZone();
     updateHud();
+    renderRankings();
     gauge.style.setProperty("--pointer", 0);
   </script>
 </body>
